@@ -1,0 +1,3 @@
+apple::0.75::9
+crisps::0.9::5
+chocolate::1.0::4
