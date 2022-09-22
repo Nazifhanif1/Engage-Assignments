@@ -145,6 +145,7 @@ public class Controller {
 
     private void exportData() throws DataPersistenceException {
         service.exportAllData();
+        view.displayExportSuccessBanner();
     }
 
     private void exitMessage() {

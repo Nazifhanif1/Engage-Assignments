@@ -5,8 +5,6 @@ import com.fm.model.Order;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.print.attribute.standard.DateTimeAtCompleted;
-
 public interface FlooringService {
 
         List<Order> getOrders(LocalDate dateChoice) throws InvalidOrderNumberException,
