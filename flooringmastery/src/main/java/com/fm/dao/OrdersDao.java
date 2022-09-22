@@ -10,9 +10,9 @@ public interface OrdersDao {
 
     Order addOrder(Order o) throws DataPersistenceException;
 
-    Order editOrder(Order editedOrder) throws DataPersistenceException;
-
     Order removeOrder(Order o) throws DataPersistenceException;
+
+    Order editOrder(Order editedOrder) throws DataPersistenceException;
 
     void getAllOrders() throws DataPersistenceException;
 

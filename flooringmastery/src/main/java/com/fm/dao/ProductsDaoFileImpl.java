@@ -28,36 +28,33 @@ public class ProductsDaoFileImpl implements ProductsDao {
     }
 
     private List<Product> loadProducts() throws DataPersistenceException {
-        Scanner scanner;
+        Scanner sc;
         List<Product> products = new ArrayList<>();
 
         try {
-            scanner = new Scanner(
+            sc = new Scanner(
                     new BufferedReader(
                             new FileReader(PRODUCTS_FILE)));
         } catch (FileNotFoundException e) {
             throw new DataPersistenceException(
-                    "-_- Could not load products data into memory.", e);
+                    "Could not load products data into memory.", e);
         }
 
         String currentLine;
         String[] currentTokens;
-        scanner.nextLine();// Skips scanning document headers
-        while (scanner.hasNextLine()) {
-            currentLine = scanner.nextLine();
+        sc.nextLine();
+        while (sc.hasNextLine()) {
+            currentLine = sc.nextLine();
             currentTokens = currentLine.split(DELIMITER);
             if (currentTokens.length == 3) {
                 Product currentProduct = new Product();
                 currentProduct.setProductType(currentTokens[0]);
                 currentProduct.setCostPerSquareFoot(new BigDecimal(currentTokens[1]));
                 currentProduct.setLaborCostPerSquareFoot(new BigDecimal(currentTokens[2]));
-                // Put currentProduct into the map using productType as the key
                 products.add(currentProduct);
-            } else {
-                // Ignores line if delimited wrong or empty.
             }
         }
-        scanner.close();
+        sc.close();
 
         if (!products.isEmpty()) {
             return products;

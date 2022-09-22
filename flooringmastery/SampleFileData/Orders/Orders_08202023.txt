@@ -1,0 +1,2 @@
+OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
+5,mike,TX,4.45,Wood,10.00,5.15,4.75,51.50,47.50,4.41,103.41

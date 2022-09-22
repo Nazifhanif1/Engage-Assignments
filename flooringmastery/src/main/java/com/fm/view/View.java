@@ -166,8 +166,8 @@ public class View {
         io.print("Good Bye!!!");
     }
 
-    public void displayUnknownCommandBanner() {
-        io.print("Unknown Command!!!");
+    public void displayErrorBanner() {
+        io.print("Error Unknown Command!!!");
         displayContinue();
     }
 
@@ -179,6 +179,11 @@ public class View {
 
     public void displayContinue() {
         io.readString("Please hit enter to continue.");
+    }
+
+    public void displayExportSuccessBanner() {
+        io.print("Data exported successfully");
+        io.print(" ");
     }
 
 }

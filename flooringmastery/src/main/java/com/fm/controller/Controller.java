@@ -50,7 +50,7 @@ public class Controller {
                         break;
 
                     default:
-                        unknownCommand();
+                        error();
                 }
 
             }
@@ -64,6 +64,25 @@ public class Controller {
         return view.printMenuAndGetSelection();
     }
 
+    private void addOrder() throws DataPersistenceException {
+        try {
+            Order o = service.getOrderDetails(view.getOrder());
+            view.displayOrder(o);
+            String reply = view.askSave();
+            if (reply.equalsIgnoreCase("Y")) {
+                service.addOrder(o);
+                view.displayAddOrderSuccess(true, o);
+            } else if (reply.equalsIgnoreCase("N")) {
+                view.displayAddOrderSuccess(false, o);
+            } else {
+                error();
+            }
+        } catch (OrderValidationException
+                | StateValidationException | ProductValidationException e) {
+            view.displayErrorMessage(e.getMessage());
+        }
+    }
+
     private void getOrdersByDate() throws DataPersistenceException {
         LocalDate dateChoice = view.inputDate();
         view.displayDateBanner(dateChoice);
@@ -71,25 +90,6 @@ public class Controller {
             view.displayDateOrders(service.getOrders(dateChoice));
             view.displayContinue();
         } catch (InvalidOrderNumberException e) {
-            view.displayErrorMessage(e.getMessage());
-        }
-    }
-
-    private void addOrder() throws DataPersistenceException {
-        try {
-            Order o = service.getOrderDetails(view.getOrder());
-            view.displayOrder(o);
-            String response = view.askSave();
-            if (response.equalsIgnoreCase("Y")) {
-                service.addOrder(o);
-                view.displayAddOrderSuccess(true, o);
-            } else if (response.equalsIgnoreCase("N")) {
-                view.displayAddOrderSuccess(false, o);
-            } else {
-                unknownCommand();
-            }
-        } catch (OrderValidationException
-                | StateValidationException | ProductValidationException e) {
             view.displayErrorMessage(e.getMessage());
         }
     }
@@ -111,7 +111,7 @@ public class Controller {
             } else if (response.equalsIgnoreCase("N")) {
                 view.displayEditOrderSuccess(false, updatedOrder);
             } else {
-                unknownCommand();
+                error();
             }
         } catch (InvalidOrderNumberException
                 | ProductValidationException | StateValidationException e) {
@@ -136,7 +136,7 @@ public class Controller {
             } else if (response.equalsIgnoreCase("N")) {
                 view.displayRemoveOrderSuccess(false, o);
             } else {
-                unknownCommand();
+                error();
             }
         } catch (InvalidOrderNumberException e) {
             view.displayErrorMessage(e.getMessage());
@@ -147,12 +147,12 @@ public class Controller {
         service.exportAllData();
     }
 
-    private void unknownCommand() {
-        view.displayUnknownCommandBanner();
-    }
-
     private void exitMessage() {
         view.displayExitBanner();
+    }
+
+    private void error() {
+        view.displayErrorBanner();
     }
 
 }

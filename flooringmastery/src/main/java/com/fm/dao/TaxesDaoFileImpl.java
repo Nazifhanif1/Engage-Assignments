@@ -28,36 +28,33 @@ public class TaxesDaoFileImpl implements TaxesDao {
     }
 
     private List<Tax> loadStates() throws DataPersistenceException {
-        Scanner scanner;
+        Scanner sc;
         List<Tax> states = new ArrayList<>();
 
         try {
-            scanner = new Scanner(
+            sc = new Scanner(
                     new BufferedReader(
                             new FileReader(TAXES_FILE)));
         } catch (FileNotFoundException e) {
             throw new DataPersistenceException(
-                    "-_- Could not load states data into memory.", e);
+                    "Could not load states data into memory.", e);
         }
 
         String currentLine;
         String[] currentTokens;
-        scanner.nextLine();
-        while (scanner.hasNextLine()) {
-            currentLine = scanner.nextLine();
+        sc.nextLine();
+        while (sc.hasNextLine()) {
+            currentLine = sc.nextLine();
             currentTokens = currentLine.split(DELIMITER);
             if (currentTokens.length == 3) {
                 Tax currentState = new Tax();
                 currentState.setStateAbbr(currentTokens[0]);
                 currentState.setStateName(currentTokens[1]);
                 currentState.setTaxRate(new BigDecimal(currentTokens[2]));
-                // Put currentState into the map using stateAbbr as the key
                 states.add(currentState);
-            } else {
-                // Ignores line if delimited wrong or empty.
             }
         }
-        scanner.close();
+        sc.close();
 
         if (!states.isEmpty()) {
             return states;

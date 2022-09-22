@@ -33,24 +33,23 @@ public class OrdersDaoFileImpl implements OrdersDao {
     }
 
     private void readLastOrderNumber() throws DataPersistenceException {
-        Scanner scanner;
+        Scanner sc;
 
         try {
             // Create Scanner to read file
-            scanner = new Scanner(
+            sc = new Scanner(
                     new BufferedReader(
                             new FileReader(dataFolder + "LastOrderNumber.txt")));
         } catch (FileNotFoundException e) {
-            // Throwing a general exception to the calling code
             throw new DataPersistenceException(
                     "-_- Could not load order number into memory.", e);
         }
 
-        int savedOrderNumber = Integer.parseInt(scanner.nextLine());
+        int getOrderNum = Integer.parseInt(sc.nextLine());
 
-        this.lastOrderNumber = savedOrderNumber;
+        this.lastOrderNumber = getOrderNum;
 
-        scanner.close();
+        sc.close();
 
     }
 
@@ -65,9 +64,7 @@ public class OrdersDaoFileImpl implements OrdersDao {
         }
 
         out.println(lastOrderNumber);
-
         out.flush();
-
         out.close();
     }
 
@@ -78,9 +75,7 @@ public class OrdersDaoFileImpl implements OrdersDao {
 
     @Override
     public Order addOrder(Order o) throws DataPersistenceException {
-        // Checks input for commas
         o = cleanFields(o);
-        // Getting the last used number, adding one, and saving it
         readLastOrderNumber();
         lastOrderNumber++;
         o.setOrderNumber(lastOrderNumber);
@@ -94,9 +89,29 @@ public class OrdersDaoFileImpl implements OrdersDao {
     }
 
     @Override
+    public Order removeOrder(Order chosenOrder)
+            throws DataPersistenceException {
+
+        int orderNumber = chosenOrder.getOrderNumber();
+
+        List<Order> orders = loadOrders(chosenOrder.getDate());
+        Order orderToRemove = orders.stream()
+                .filter(o -> o.getOrderNumber() == orderNumber)
+                .findFirst().orElse(null);
+
+        if (orderToRemove != null) {
+            orders.remove(orderToRemove);
+            writeOrders(orders, chosenOrder.getDate());
+            return orderToRemove;
+        } else {
+            return null;
+        }
+
+    }
+
+    @Override
     public Order editOrder(Order editedOrder)
             throws DataPersistenceException {
-        // Checks input for commas
         editedOrder = cleanFields(editedOrder);
         int orderNumber = editedOrder.getOrderNumber();
 
@@ -115,29 +130,8 @@ public class OrdersDaoFileImpl implements OrdersDao {
         }
     }
 
-    @Override
-    public Order removeOrder(Order chosenOrder)
-            throws DataPersistenceException {
-
-        int orderNumber = chosenOrder.getOrderNumber();
-
-        List<Order> orders = loadOrders(chosenOrder.getDate());
-        Order removedOrder = orders.stream()
-                .filter(o -> o.getOrderNumber() == orderNumber)
-                .findFirst().orElse(null);
-
-        if (removedOrder != null) {
-            orders.remove(removedOrder);
-            writeOrders(orders, chosenOrder.getDate());
-            return removedOrder;
-        } else {
-            return null;
-        }
-
-    }
-
     private Order cleanFields(Order order) {
-        // Dao does not know what the other layers are doing so its clearing delimiters
+
         String cleanCustomerName = order.getCustomerName().replace(DELIMITER, "");
         String cleanStateAbbr = order.getState().replace(DELIMITER, "");
         String cleanProductType = order.getProductType().replace(DELIMITER, "");
@@ -150,8 +144,7 @@ public class OrdersDaoFileImpl implements OrdersDao {
     }
 
     private List<Order> loadOrders(LocalDate chosenDate) throws DataPersistenceException {
-        // Loads one file for a specific date
-        Scanner scanner;
+        Scanner sc;
         String fileDate = chosenDate.format(DateTimeFormatter.ofPattern("MMddyyyy"));
 
         File f = new File(String.format(dataFolder + "Orders_%s.txt", fileDate));
@@ -160,7 +153,7 @@ public class OrdersDaoFileImpl implements OrdersDao {
 
         if (f.isFile()) {
             try {
-                scanner = new Scanner(
+                sc = new Scanner(
                         new BufferedReader(
                                 new FileReader(f)));
             } catch (FileNotFoundException e) {
@@ -169,9 +162,9 @@ public class OrdersDaoFileImpl implements OrdersDao {
             }
             String currentLine;
             String[] currentTokens;
-            scanner.nextLine();
-            while (scanner.hasNextLine()) {
-                currentLine = scanner.nextLine();
+            sc.nextLine();
+            while (sc.hasNextLine()) {
+                currentLine = sc.nextLine();
                 currentTokens = currentLine.split(DELIMITER);
                 if (currentTokens.length == 12) {
                     Order currentOrder = new Order();
@@ -190,11 +183,9 @@ public class OrdersDaoFileImpl implements OrdersDao {
                     currentOrder.setTax(new BigDecimal(currentTokens[10]));
                     currentOrder.setTotal(new BigDecimal(currentTokens[11]));
                     orders.add(currentOrder);
-                } else {
-                    // Ignore line.
                 }
             }
-            scanner.close();
+            sc.close();
             return orders;
         } else {
             return orders;
@@ -218,10 +209,9 @@ public class OrdersDaoFileImpl implements OrdersDao {
                     "Could not save order data.", e);
         }
 
-        // Write out the Order objects to the file.
         out.println(HEADER);
         for (Order currentOrder : orders) {
-            // Write the Order objects to the file
+
             out.println(currentOrder.getOrderNumber() + DELIMITER
                     + currentOrder.getCustomerName() + DELIMITER
                     + currentOrder.getState() + DELIMITER
@@ -235,10 +225,8 @@ public class OrdersDaoFileImpl implements OrdersDao {
                     + currentOrder.getTax() + DELIMITER
                     + currentOrder.getTotal());
 
-            // Force PrintWriter to write line to the file
             out.flush();
         }
-        // Clean up
         out.close();
     }
 
@@ -282,8 +270,6 @@ public class OrdersDaoFileImpl implements OrdersDao {
                         currentOrder.setTax(new BigDecimal(currentTokens[10]));
                         currentOrder.setTotal(new BigDecimal(currentTokens[11]));
                         orders.add(currentOrder);
-                    } else {
-                        // Ignore line.
                     }
                 }
             }
@@ -298,10 +284,9 @@ public class OrdersDaoFileImpl implements OrdersDao {
                     "Could not save order data.", e);
         }
 
-        // Write out the Order objects to the file.
         out.println(HEADER + ",date");
         for (Order currentOrder : orders) {
-            // Write the Order objects to the file
+
             out.println(currentOrder.getOrderNumber() + DELIMITER
                     + currentOrder.getCustomerName() + DELIMITER
                     + currentOrder.getState() + DELIMITER
@@ -316,10 +301,8 @@ public class OrdersDaoFileImpl implements OrdersDao {
                     + currentOrder.getTotal() + DELIMITER
                     + currentOrder.getDate());
 
-            // Force PrintWriter to write line to the file
             out.flush();
         }
-        // Clean up
         out.close();
     }
 

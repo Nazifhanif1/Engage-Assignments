@@ -81,8 +81,7 @@ public class FlooringServiceImpl implements FlooringService {
         // Set product information in order.
         Product chosenProduct = productsDao.getProduct(o.getProductType());
         if (chosenProduct == null) {
-            throw new ProductValidationException("ERROR: We do not sell that "
-                    + "product.");
+            throw new ProductValidationException("ERROR: We do not sell that " + "product.");
         }
         o.setProductType(chosenProduct.getProductType());
         o.setCostPerSquareFoot(chosenProduct.getCostPerSquareFoot());
@@ -131,10 +130,8 @@ public class FlooringServiceImpl implements FlooringService {
             throws DataPersistenceException, StateValidationException,
             ProductValidationException {
 
-        // This will only update the already saved order's fields
         if (editedOrder.getCustomerName() == null
                 || editedOrder.getCustomerName().trim().equals("")) {
-            // No change
         } else {
             savedOrder.setCustomerName(editedOrder.getCustomerName());
         }
@@ -165,11 +162,11 @@ public class FlooringServiceImpl implements FlooringService {
     }
 
     @Override
-    public Order editOrder(Order updatedOrder) throws DataPersistenceException,
+    public Order removeOrder(Order removedOrder) throws DataPersistenceException,
             InvalidOrderNumberException {
-        updatedOrder = ordersDao.editOrder(updatedOrder);
-        if (updatedOrder != null) {
-            return updatedOrder;
+        removedOrder = ordersDao.removeOrder(removedOrder);
+        if (removedOrder != null) {
+            return removedOrder;
         } else {
             throw new InvalidOrderNumberException("ERROR: No orders with that number "
                     + "exist on that date.");
@@ -177,11 +174,11 @@ public class FlooringServiceImpl implements FlooringService {
     }
 
     @Override
-    public Order removeOrder(Order removedOrder) throws DataPersistenceException,
+    public Order editOrder(Order updatedOrder) throws DataPersistenceException,
             InvalidOrderNumberException {
-        removedOrder = ordersDao.removeOrder(removedOrder);
-        if (removedOrder != null) {
-            return removedOrder;
+        updatedOrder = ordersDao.editOrder(updatedOrder);
+        if (updatedOrder != null) {
+            return updatedOrder;
         } else {
             throw new InvalidOrderNumberException("ERROR: No orders with that number "
                     + "exist on that date.");
